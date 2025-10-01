@@ -7,38 +7,46 @@ export default function BlueprintCanvas({ points = [], width = 520, height = 360
     const canvas = ref.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
+
+    // Fondo
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.fillStyle = '#0b1220'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    
     ctx.strokeStyle = 'rgba(148,163,184,0.15)'
     ctx.lineWidth = 1
-    for (let x = 0; x < canvas.width; x += 40) {
+    const step = 40
+    for (let x = 0; x < canvas.width; x += step) {
       ctx.beginPath()
       ctx.moveTo(x, 0)
       ctx.lineTo(x, canvas.height)
       ctx.stroke()
     }
-    for (let y = 0; y < canvas.height; y += 40) {
+    for (let y = 0; y < canvas.height; y += step) {
       ctx.beginPath()
       ctx.moveTo(0, y)
       ctx.lineTo(canvas.width, y)
       ctx.stroke()
     }
+
+    // Segmentos consecutivos p0->p1->p2->...
     if (points.length > 1) {
-      ctx.strokeStyle = '#93c5fd'
-      ctx.lineWidth = 2
       ctx.beginPath()
+      ctx.lineWidth = 2
+      ctx.strokeStyle = '#93c5fd' // azul claro
       ctx.moveTo(points[0].x, points[0].y)
       for (let i = 1; i < points.length; i++) {
-        const p = points[i]
-        ctx.lineTo(p.x, p.y)
+        ctx.lineTo(points[i].x, points[i].y)
       }
       ctx.stroke()
     }
-    ctx.fillStyle = '#fbbf24'
+
+    // Puntos (marcas)
+    ctx.fillStyle = '#fca5a5' // rojo suave
     for (const p of points) {
       ctx.beginPath()
-      ctx.arc(p.x, p.y, 4, 0, Math.PI * 2)
+      ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2)
       ctx.fill()
     }
   }, [points])
@@ -55,6 +63,7 @@ export default function BlueprintCanvas({ points = [], width = 520, height = 360
         width: '100%',
         maxWidth: width,
       }}
+      data-testid="blueprint-canvas"
     />
   )
 }

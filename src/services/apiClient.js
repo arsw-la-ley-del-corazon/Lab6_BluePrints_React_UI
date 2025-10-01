@@ -1,27 +1,37 @@
 import axios from 'axios'
+import mock from './mockApiClient.js'
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
-  timeout: 8000,
-})
+const useMock = String(import.meta.env.VITE_USE_MOCK || '').toLowerCase() === 'true'
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+let client
 
-api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err.response && err.response.status === 401) {
-      // Optionally redirect to login or clear token
-      localStorage.removeItem('token')
-    }
-    return Promise.reject(err)
-  },
-)
+if (useMock) {
+  
+  console.log('⚠️ Usando MOCK de blueprints')
+  client = mock
+} else {
+  const api = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api',
+    timeout: 8000,
+  })
 
-export default api
+  api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token')
+    if (token) config.headers.Authorization = `Bearer ${token}`
+    return config
+  })
+
+  api.interceptors.response.use(
+    (res) => res,
+    (err) => {
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token')
+      }
+      return Promise.reject(err)
+    },
+  )
+
+  client = api
+}
+
+export default client
