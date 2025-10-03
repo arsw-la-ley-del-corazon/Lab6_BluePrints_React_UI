@@ -1,14 +1,16 @@
 import { useEffect, useRef } from 'react'
 
-export default function BlueprintCanvas({ points = [], width = 520, height = 360 }) {
+export default function BlueprintCanvas({id , name = 'Plano', points = [], width = 520, height = 360 }) {
   const ref = useRef(null)
+
+  const autoIdRef = useRef(`blueprint-canvas-${Math.random().toString(36).slice(2, 9)}`)
+  const canvasId = id || autoIdRef.current
 
   useEffect(() => {
     const canvas = ref.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
 
-    // Fondo
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.fillStyle = '#0b1220'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
@@ -30,11 +32,10 @@ export default function BlueprintCanvas({ points = [], width = 520, height = 360
       ctx.stroke()
     }
 
-    // Segmentos consecutivos p0->p1->p2->...
     if (points.length > 1) {
       ctx.beginPath()
       ctx.lineWidth = 2
-      ctx.strokeStyle = '#93c5fd' // azul claro
+      ctx.strokeStyle = '#93c5fd'
       ctx.moveTo(points[0].x, points[0].y)
       for (let i = 1; i < points.length; i++) {
         ctx.lineTo(points[i].x, points[i].y)
@@ -42,8 +43,8 @@ export default function BlueprintCanvas({ points = [], width = 520, height = 360
       ctx.stroke()
     }
 
-    // Puntos (marcas)
-    ctx.fillStyle = '#fca5a5' // rojo suave
+
+    ctx.fillStyle = '#fca5a5' 
     for (const p of points) {
       ctx.beginPath()
       ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2)
@@ -53,6 +54,7 @@ export default function BlueprintCanvas({ points = [], width = 520, height = 360
 
   return (
     <canvas
+      id ={canvasId}
       ref={ref}
       width={width}
       height={height}
